@@ -11,8 +11,8 @@ from process import main
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Resume Maker API",
-    description="A FastAPI application for resume generation with cross validation",
+    title="Mpower AI API",
+    description="A FastAPI application for Mpower AI",
     version="1.0.0"
 )
 
