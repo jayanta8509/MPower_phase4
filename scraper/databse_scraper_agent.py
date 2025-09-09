@@ -1,9 +1,16 @@
+import os
 from datetime import datetime
 from decimal import Decimal
 import pyodbc
 from functools import wraps
 import asyncio
 import json
+
+DRIVER = os.getenv("DRIVER")
+SERVER = os.getenv("SERVER")
+DATABASE = os.getenv("DATABASE")
+TRUSTED_CONNECTION = os.getenv("TRUSTED_CONNECTION")
+
 
 
 
@@ -18,10 +25,10 @@ async def fetch_data_async():
     try:
         conn = pyodbc.connect(
 
-            'DRIVER={SQL Server};'
-            'SERVER=DESKTOP-68FBO4B;'
-            'DATABASE=MPOWER_TEST2;'
-            'Trusted_Connection=yes;'
+            DRIVER=DRIVER,
+            SERVER=SERVER,
+            DATABASE=DATABASE,
+            Trusted_Connection=TRUSTED_CONNECTION
         )
         cursor = conn.cursor()
 
