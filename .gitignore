@@ -1,0 +1,9 @@
+.env
+env
+__pycache__
+logic
+uploads
+scraper/__pycache__
+McpAgent/__pycache__
+Jayanta_Roy_CV.pdf
+test.py
