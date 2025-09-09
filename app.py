@@ -1,13 +1,17 @@
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator, Field, HttpUrl
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 import uvicorn
 from datetime import datetime
 import os
 import aiofiles
 from pathlib import Path
 from process import main
+# from job_maching_explation.json_data_fech import fetch_data_async
+from job_maching_explation.job_percentage_explain import matching_explanation
+
+
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -27,6 +31,11 @@ app.add_middleware(
 
 
 
+# Pydantic models for job matching explanation
+class JobMatchRequest(BaseModel):
+    status: str
+    data: Dict[str, Any]
+
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -40,7 +49,10 @@ async def root():
         "docs": "/docs",
         "endpoints": {
             "health": "/health",
-            "improvement_profile": "/improvement-profile"
+            "improvement_profile": "/improvement-profile",
+            "job_member_data": "/job-member-data",
+            "job_member_matching_explanation": "/job-member-matching-explanation",
+            "job_matching_explanation": "/job-matching-explanation"
         }
     }
 @app.get("/health")
@@ -112,11 +124,35 @@ async def improve_resume(
         
 
 
+@app.post("/job-matching-explanation")
+async def job_matching_explanation(request: JobMatchRequest):
+    """
+    Analyze job matching and provide detailed explanation
+    Accepts complete job and member data structure
+    """
+    try:
+        result, tokens = await matching_explanation(request.dict())
+        
+        if result and "error" in result:
+            raise HTTPException(status_code=400, detail=result["error"])
+            
+        return {
+            "status": "success",
+            "analysis": result,
+            "tokens_used": tokens
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error analyzing job match: {str(e)}")
+
+
 if __name__ == "__main__":
     uvicorn.run(
         "app:app",
         host="0.0.0.0",
-        port=8000,
+        port=8001,
         reload=True,
         log_level="info"
     )
