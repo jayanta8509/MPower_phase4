@@ -3,7 +3,6 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-009688.svg?style=flat&logo=FastAPI)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg?style=flat&logo=python)](https://python.org)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4O-412991.svg?style=flat&logo=openai)](https://openai.com)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat)](LICENSE)
 
 ## 🚀 Overview
 
@@ -342,7 +341,7 @@ This project is licensed under the MPower License - see the [LICENSE](LICENSE) f
 
 For support and questions:
 
-- 📧 Email: support@mpower-ai.com
+- 📧 Email: jayantaeslova@gmail.com
 - 📖 Documentation: `/docs` endpoint
 - 🐛 Issues: GitHub Issues page
 
