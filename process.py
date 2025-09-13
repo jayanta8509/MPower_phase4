@@ -39,7 +39,7 @@ async def main(path):
     
     # Extract data for all agents
     resume_step = resume_array.steps[0]
-    
+    resume_string_step = string_data.steps[0]
     # Run all MCP agents in parallel
     agent_results = await asyncio.gather(
         character_agent(databse_data['character'], resume_step.character),
@@ -48,7 +48,7 @@ async def main(path):
         growthmindset_agent(databse_data['growthmindset'], resume_step.growthMindset),
         mindfulness_agent(databse_data['mindfulness'], resume_step.mindfulness),
         technicalskills_agent(databse_data['technicalskills'], resume_step.technicalSkill),
-        industry_agent(databse_data['industry'], resume_step.industry),
+        industry_agent(databse_data['industry'], resume_string_step),
         educationlevel_agent(databse_data['educationlevel'], resume_step.memberEducationLevel),
         communication_agent(databse_data['communication'], resume_step.communication),
         leadership_agent(databse_data['leadership'], resume_step.leadership),
@@ -62,27 +62,39 @@ async def main(path):
     processed_results = {}
     agent_names = [
         'character', 'collaboration', 'creativity', 'growthmindset', 
-        'mindfulness', 'technicalskills', 'industry', 'educationlevel',
+        'mindfulness', 'technicalskills', 'experience', 'educationlevel',
         'communication', 'leadership', 'metacognition', 'criticalthinking', 'fortitude'
     ]
     
     for i, (result, tokens) in enumerate(agent_results):
-        # Store only the matched_ids array (flat structure)
-        processed_results[agent_names[i]] = result.steps[0].id if result else [0]
+        # Handle industry_agent differently since it returns experience data
+        if agent_names[i] == 'experience':
+            # For industry agent, return the complete experience data with industryId populated
+            processed_results[agent_names[i]] = result.steps[0].experience if result else []
+        else:
+            # Store only the matched_ids array (flat structure) for other agents
+            processed_results[agent_names[i]] = result.steps[0].id if result else [0]
         agent_tokens += tokens
     
     total_tokens = total_tokens1 + total_tokens2 + agent_tokens
     
-    # Remove the "steps" wrapper from string_data
+    # Remove the "steps" wrapper from string_data and exclude experience data
     clean_string_data = string_data.steps[0] if string_data.steps else {}
     
-    return clean_string_data, processed_results, total_tokens
+    # Remove experience from clean_string_data since it's handled by industry_agent
+    if hasattr(clean_string_data, 'experience'):
+        clean_string_data_dict = clean_string_data.model_dump()
+        clean_string_data_dict.pop('experience', None)
+    else:
+        clean_string_data_dict = clean_string_data
+    
+    return clean_string_data_dict, processed_results, total_tokens
 
 
-# if __name__ == "__main__":
-#     path = "Jayanta_Roy_CV.pdf"
-#     string_data, processed_results, total_tokens = asyncio.run(main(path))
-#     print("string_data: ", string_data)
-#     print("processed_results: ", processed_results)
-#     print("total_tokens: ", total_tokens)
+if __name__ == "__main__":
+    path = "Jayanta_Roy_CV.pdf"
+    string_data, processed_results, total_tokens = asyncio.run(main(path))
+    print("string_data: ", string_data)
+    print("processed_results: ", processed_results)
+    print("total_tokens: ", total_tokens)
 

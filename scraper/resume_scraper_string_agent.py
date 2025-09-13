@@ -1,3 +1,4 @@
+from multiprocessing import current_process
 import os
 import re
 from pydantic import BaseModel
@@ -20,6 +21,7 @@ class date(BaseModel):
 class experience(BaseModel):
     jobTitle: str
     company: str
+    currentlyWorking: bool
     description: str
     date: date
     
@@ -70,22 +72,26 @@ async def analyze_resume(input_question):
         5. **experience Company:**
            - analyze the candidate's work experience and suggest the most suitable company
 
-        6. **experience Description:**
+        6. **experience Currently Working:**
+           - Set to true if the candidate is currently working at this company (indicated by phrases like "Present", "Current", "ongoing", or no end date)
+           - Set to false if the candidate is no longer working at this company (has a specific end date)
+
+        7. **experience Description:**
            - analyze the candidate's work experience and suggest the most suitable job description
 
-        7. **education School:**
+        8. **education School:**
            - analyze the candidate's education and suggest the most suitable school
 
-        8. **education Degree:**
+        9. **education Degree:**
            - analyze the candidate's education and suggest the most suitable degree
 
-        9. **education Field Study:**
+        10. **education Field Study:**
            - analyze the candidate's education and suggest the most suitable field of study
 
-        10. **education Description:**
+        11. **education Description:**
            - analyze the candidate's education and suggest the most suitable education description
 
-        11. **other Skill Name:**
+        12. **other Skill Name:**
           - analyze the candidate's technical skill set and suggest the most suitable other skill name
            - Frameworks & Libraries
            - Databases
