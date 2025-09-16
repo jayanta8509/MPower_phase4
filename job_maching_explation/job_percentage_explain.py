@@ -18,6 +18,10 @@ class JobMatchAnalysis(BaseModel):
     strengths: list[str]
     gaps: list[str] 
     recommendations: list[str]
+    fundamental_skills_matched: list[str]
+    technical_skills_matched: list[str]
+    visa_sponsorship : bool
+    
 
 
 async def matching_explanation(data):
@@ -33,6 +37,8 @@ async def matching_explanation(data):
         member_data = data["data"]["member"]
         job_data = data["data"]["jobpost"] 
         match_percentage = data["data"].get("Matching_Percentage", 0)
+        # Check for visa_sponsorship in both locations (root level and inside data)
+        visa_sponsorship_needed = data.get("visa_sponsorship", data["data"].get("visa_sponsorship", False))
     else:
         # Old format: just job_id and member_id - would need to fetch data
         # For now, return error asking for complete data structure
@@ -50,6 +56,7 @@ JOB POSTING:
 - Industry: {job_data.get('Industry', 'N/A')}
 - Role: {job_data.get('Role', 'N/A')}
 - Location: {job_data.get('JobLocation', 'N/A')}
+- Visa Sponsorship Required: {visa_sponsorship_needed}
 
 YOUR PROFILE:
 - Headline: {member_data.get('Headline', 'N/A')}
@@ -82,19 +89,32 @@ MATCHING ALGORITHM COMPONENTS:
 7. Role (5%): Job's Role matched against your Job Titles
 8. Location (5%): Job's Location matched against your City
 
+SKILL ANALYSIS REQUIREMENTS:
+1. FUNDAMENTAL SKILLS MATCHING: Analyze and identify which fundamental/soft skills from your profile (Communication, Leadership, Critical Thinking, Collaboration, Character, Creativity, Growth Mindset, Mindfulness, Fortitude) match with the job requirements. Consider both explicit mentions and implicit requirements based on job responsibilities.
+
+2. TECHNICAL SKILLS MATCHING: Analyze and identify which technical skills from your profile (TechnicalSkillNames, OtherSkills) directly match with the job's Required Skills, Preferred Skills, and responsibilities. Include programming languages, frameworks, tools, platforms, methodologies, and domain-specific technical knowledge.
+
+3. VISA SPONSORSHIP ANALYSIS: The candidate requires visa sponsorship: {visa_sponsorship_needed}. Analyze how this might impact job eligibility and application strategy.
+
 Based on the above information and matching algorithm, provide a detailed explanation of:
 1. Why your profile received a {match_percentage}% match score for this job
 2. Identify the strongest matching areas between your profile and the job
 3. Identify skills or qualifications gaps you should work on to improve your match percentage
 4. Provide 3-5 specific, actionable recommendations for how you can improve your match score
+5. List specific fundamental skills that match between your profile and job requirements
+6. List specific technical skills that match between your profile and job requirements
+7. Analyze visa sponsorship implications for this job opportunity
 
 Provide your response with these components:
 - match_explanation: detailed explanation text of why the profile received this match score
 - strengths: list of matching strengths between the profile and job (provide as array of strings)
 - gaps: list of skill/qualification gaps that should be addressed (provide as array of strings)  
 - recommendations: list of specific, actionable recommendations for improvement (provide as array of strings)
+- fundamental_skills_matched: list of specific fundamental/soft skills that match between your profile and job requirements (provide as array of strings)
+- technical_skills_matched: list of specific technical skills that match between your profile and job requirements (provide as array of strings)
+- visa_sponsorship: boolean value indicating whether visa sponsorship is required for this position (MUST return exactly {visa_sponsorship_needed})
 
-IMPORTANT: strengths, gaps, and recommendations MUST be arrays of strings, not single strings or other formats.
+IMPORTANT: All list fields (strengths, gaps, recommendations, fundamental_skills_matched, technical_skills_matched) MUST be arrays of strings, not single strings or other formats. The visa_sponsorship field MUST be the exact boolean value {visa_sponsorship_needed} as provided in the input.
 """
 
     try:
