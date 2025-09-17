@@ -10,6 +10,8 @@ DRIVER = os.getenv("DRIVER")
 SERVER = os.getenv("SERVER")
 DATABASE = os.getenv("DATABASE")
 TRUSTED_CONNECTION = os.getenv("TRUSTED_CONNECTION")
+UID = os.getenv("UID")
+PWD = os.getenv("PWD")
 
 
 
@@ -23,13 +25,24 @@ def async_route(f):
 
 async def fetch_data_async():
     try:
-        conn = pyodbc.connect(
-
-            DRIVER=DRIVER,
-            SERVER=SERVER,
-            DATABASE=DATABASE,
-            Trusted_Connection=TRUSTED_CONNECTION
-        )
+        # Build connection string based on available authentication method
+        if TRUSTED_CONNECTION and TRUSTED_CONNECTION.lower() == 'yes':
+            # Windows Authentication
+            conn = pyodbc.connect(
+                DRIVER=DRIVER,
+                SERVER=SERVER,
+                DATABASE=DATABASE,
+                Trusted_Connection=TRUSTED_CONNECTION
+            )
+        else:
+            # SQL Server Authentication
+            conn = pyodbc.connect(
+                DRIVER=DRIVER,
+                SERVER=SERVER,
+                DATABASE=DATABASE,
+                UID=UID,
+                PWD=PWD
+            )
         cursor = conn.cursor()
 
         # Lookup table queries for ID and Name pairs

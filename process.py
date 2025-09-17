@@ -37,6 +37,10 @@ async def main(path):
     string_data, total_tokens2 = results[1]
     databse_data = results[2]
     
+    # Check if database connection failed
+    if isinstance(databse_data, dict) and 'error' in databse_data:
+        raise Exception(f"Database connection failed: {databse_data['error']}")
+    
     # Extract data for all agents
     resume_step = resume_array.steps[0]
     resume_string_step = string_data.steps[0]

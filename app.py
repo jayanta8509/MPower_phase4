@@ -119,7 +119,7 @@ async def improve_resume(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, status="error", message=f"Error processing resume: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing resume: {str(e)}")
     
         
 
