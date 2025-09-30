@@ -50,54 +50,58 @@ class resume_data(BaseModel):
 
 async def analyze_resume(input_question):
 
-    prompt_template = """ You are an expert resume parser. Extract the following information from the resume and structure it according to the specified format:
-        1. **headline**
-           - Based on the candidate's work experience, education, and technical skill set, suggest the most suitable job role they are likely to be both qualified for and interested in
-           - The suggested role should align with the candidate's career progression, domain expertise, and strengths demonstrated in their resume
-           - Ensure the recommendation reflects realistic career advancement and industry relevance
+    prompt_template = """ You are an elite AI resume intelligence system with deep expertise in talent analysis and career optimization. Your mission is to extract, analyze, and enhance resume data with surgical precision and strategic insight.
 
-        2. **Member FirstName and Member LastName:**
-           - Candidate's first name
-           - Candidate's last name
+        🎯 **CRITICAL EXTRACTION REQUIREMENTS:**
 
-        3. **Member FirstName and Member LastName:**
-           - Candidate's first name
-           - Candidate's last name
+        1. **🚀 HEADLINE - Career Trajectory Optimization:**
+           - Analyze the candidate's ENTIRE professional DNA: experience depth, technical mastery, leadership indicators, and growth trajectory
+           - Synthesize a POWERFUL headline that positions them for their next career leap (not just current level)
+           - Consider market demand, salary potential, and career progression paths
+           - Make it compelling, specific, and achievement-oriented (e.g., "Senior Full-Stack Engineer | React/Node.js Expert | 5+ Years Building Scalable SaaS Platforms")
+
+        2. **👤 IDENTITY EXTRACTION:**
+           - memberFirstName: Extract exact first name (clean, no titles/prefixes)
+           - memberLastName: Extract exact last name (clean, no suffixes)
+
+        3. **💼 EXPERIENCE INTELLIGENCE - Extract ALL positions:**
+           For EACH work experience, provide:
+           - **jobTitle**: Extract or intelligently infer the most accurate job title that reflects their actual responsibilities
+           - **company**: Extract exact company name (clean, professional format)
+           - **currentlyWorking**: TRUE if currently employed (keywords: "Present", "Current", "Now", no end date, recent dates), FALSE otherwise
+           - **description**: Craft a compelling 2-3 sentence summary highlighting KEY achievements, technologies used, and impact created
+           - **date**: Extract precise start/end dates (format: "MM/YYYY" or "Month YYYY")
+
+        4. **🎓 EDUCATION MASTERY - Extract ALL educational credentials:**
+           For EACH education entry, provide:
+           - **CollegeUniversity**: Extract exact institution name
+           - **degree**: Extract specific degree type and level
+           - **fieldStudy**: Extract precise field/major/specialization
+           - **description**: Create a concise summary including GPA (if mentioned), honors, relevant coursework, or achievements
+           - **date**: Extract graduation date or study period
+
+        5. **⚡ OTHER SKILLS - MAXIMUM 10 HIGH-IMPACT SKILLS:**
+           🔥 **SKILL SELECTION CRITERIA - BE RUTHLESS:**
+           - Prioritize PROGRAMMING LANGUAGES first (Python, JavaScript, Java, C++, etc.)
+           - Include ONLY the most relevant and marketable skills
+           - Focus on skills that appear multiple times or are emphasized in the resume
+           - Categorize intelligently:
+             * Programming Languages (Python, JavaScript, Java, etc.)
+             * Frameworks & Libraries (React, Django, Spring Boot, etc.)
+             * Databases (PostgreSQL, MongoDB, Redis, etc.)
+             * Cloud & DevOps (AWS, Docker, Kubernetes, etc.)
+             * Tools & Technologies (Git, Jenkins, Tableau, etc.)
            
+           ⚠️ **STRICT LIMIT: MAXIMUM 10 SKILLS TOTAL**
+           - Select only the TOP 10 most valuable and relevant skills
+           - Prioritize skills that directly relate to their target job roles
+           - Exclude basic/common skills unless they're specifically highlighted
 
-
-        4. **experience Job Title:**
-           - analyze the candidate's work experience and suggest the most suitable job title
-           
-        5. **experience Company:**
-           - analyze the candidate's work experience and suggest the most suitable company
-
-        6. **experience Currently Working:**
-           - Set to true if the candidate is currently working at this company (indicated by phrases like "Present", "Current", "ongoing", or no end date)
-           - Set to false if the candidate is no longer working at this company (has a specific end date)
-
-        7. **experience Description:**
-           - analyze the candidate's work experience and suggest the most suitable job description
-
-        8. **education School:**
-           - analyze the candidate's education and suggest the most suitable school
-
-        9. **education Degree:**
-           - analyze the candidate's education and suggest the most suitable degree
-
-        10. **education Field Study:**
-           - analyze the candidate's education and suggest the most suitable field of study
-
-        11. **education Description:**
-           - analyze the candidate's education and suggest the most suitable education description
-
-        12. **other Skill Name:**
-          - analyze the candidate's technical skill set and suggest the most suitable other skill name
-           - Frameworks & Libraries
-           - Databases
-           - Tools & Technologies
-           - Domain Expertise
-           (Create appropriate categories based on the resume content)
+        🎯 **OUTPUT EXCELLENCE STANDARDS:**
+        - Be precise, professional, and market-ready
+        - Every field should add value to their professional profile
+        - Focus on achievements, impact, and growth potential
+        - Ensure all extracted data is clean, consistent, and compelling
 
         """
 
