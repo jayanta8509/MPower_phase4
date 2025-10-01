@@ -48,6 +48,7 @@ async def fetch_data_async():
         # Lookup table queries for ID and Name pairs
         queries = {
             "industry": "SELECT Id, IndustryName FROM Industry",
+            "JobLevel": "SELECT Id, JobLevelName FROM JobLevel",
             "educationlevel": "SELECT Id, EducationLevelName FROM EducationLevel",
             "communication": "SELECT Id, CommunicationName FROM Communication",
             "leadership": "SELECT Id, LeadershipName FROM Leadership",

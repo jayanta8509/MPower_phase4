@@ -17,7 +17,6 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 
 class Step(BaseModel):
     industry: str
-    memberEducationLevel: str
     communication: str
     leadership: str
     metacognition: str
@@ -45,7 +44,6 @@ async def analyze_resume_array(input_question):
 
         **Professional Information:**
         - industry: Identify the primary industry based on work experience, skills, and career focus
-        - memberEducationLevel: Determine the highest education level achieved (e.g., "High School", "Bachelor's Degree", "Master's Degree", "PhD", "Professional Certification", etc.)
         
         **Soft Skills Assessment (Provide descriptive assessment - NOT numeric ratings):**
         - communication: Assess communication skills based on resume presentation, writing quality, professional experience, and any communication-related achievements

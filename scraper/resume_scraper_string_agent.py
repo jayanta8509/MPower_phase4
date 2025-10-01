@@ -69,8 +69,8 @@ async def analyze_resume(input_question):
            - **jobTitle**: Extract or intelligently infer the most accurate job title that reflects their actual responsibilities
            - **company**: Extract exact company name (clean, professional format)
            - **currentlyWorking**: TRUE if currently employed (keywords: "Present", "Current", "Now", no end date, recent dates), FALSE otherwise
-           - **description**: Craft a compelling 2-3 sentence summary highlighting KEY achievements, technologies used, and impact created
-           - **date**: Extract precise start/end dates (format: "MM/01/YYYY" )
+           - **description**: Craft a compelling 5-6 sentence summary highlighting KEY achievements, technologies used, and impact created
+           - **date**: Extract precise start/end dates (format: "MM/01/YYYY" ) if end date is not present, use 00/00/0000 as end date and always use date format as start date and end date don't write "present" as end date other string in date section 
 
         4. **🎓 EDUCATION MASTERY - Extract ALL educational credentials:**
            For EACH education entry, provide:
@@ -78,7 +78,7 @@ async def analyze_resume(input_question):
            - **degree**: Extract specific degree type and level
            - **fieldStudy**: Extract precise field/major/specialization
            - **description**: Create a concise summary including GPA (if mentioned), honors, relevant coursework, or achievements
-           - **date**: Extract precise start/end dates (format: "MM/01/YYYY" )
+           - **date**: Extract precise start/end dates (format: "MM/01/YYYY" ) if end date is not present, use 00/00/0000 as end date and always use date format as start date and end date don't write "present" as end date other string in date section
 
         5. **⚡ OTHER SKILLS - MAXIMUM 10 HIGH-IMPACT SKILLS:**
            🔥 **SKILL SELECTION CRITERIA - BE RUTHLESS:**

@@ -13,48 +13,54 @@ from shared_client import get_async_client
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
+class date(BaseModel):
+    dateFrom: str
+    dateTo: str
 
+class education(BaseModel):
+    CollegeUniversity: str
+    memberEducationLevelId: int
+    degree: str
+    fieldStudy: str
+    description: str
+    date: date
 
 class Step(BaseModel):
-    id: list[int]
+    education: list[education]
 
 
 class resume_data(BaseModel):
     steps: list[Step]
 
 
-async def educationlevel_agent(educationlevel_database, resume_educationlevel_assessment):
+async def educationlevel_agent(educationlevel_database, education_history):
     """
-    Analyzes resume education level assessment against database education level categories
-    Returns matching IDs or [0] if no matches found
+    Analyzes the full education history and appends memberEducationLevelId to each entry
+    while preserving all other fields exactly as-is. If no clear level, use 0.
     
     Args:
         educationlevel_database: Dict with education level categories (e.g., {"1": "High School degree", "2": "2 year degree", ...})
-        resume_educationlevel_assessment: String with education level assessment from resume analysis
+        education_history: List of education entries with fields CollegeUniversity, degree, fieldStudy, description, date
     """
 
     # Format the education level database for the prompt
     educationlevel_options = "\n".join([f'"{id}": "{level}"' for id, level in educationlevel_database.items()])
 
-    prompt_template = f"""You are an expert at analyzing education levels and matching them to predefined categories.
+    prompt_template = f"""You are an expert at analyzing education histories and matching each entry to predefined education level categories.
 
 **Your Task:**
-Analyze the resume education level assessment and determine which education level from the database best matches the highest education achieved.
+For each education entry, determine the most appropriate education level from the database and add memberEducationLevelId to that entry. Do not change any other fields.
 
 **Education Level Database Options:**
 {educationlevel_options}
 
-**Resume Education Level Assessment:**
-{resume_educationlevel_assessment}
-
 **Instructions:**
-1. Carefully read the resume education level assessment
-2. Identify the highest level of education mentioned or achieved
-3. Match it to the most appropriate category from the database
-4. Return the ID of the matching education level as a list with one integer
-5. If no clear education level can be determined, return [0]
-6. Only select the highest level of education achieved
-7. Consider both formal degrees and professional certifications
+1. Carefully read each education entry (degree, field of study, description, institution, dates)
+2. Match that single entry to the most appropriate category from the database
+3. Add memberEducationLevelId with the chosen ID for that entry
+4. If no clear education level can be determined for an entry, set memberEducationLevelId to 0 for that entry
+5. Preserve every other field exactly as provided (CollegeUniversity, degree, fieldStudy, description, date)
+6. Do not remove or reorder entries; return the same list with the added IDs
 
 **Matching Guidelines:**
 - High School degree (1): High school diploma, GED, or equivalent secondary education
@@ -62,35 +68,31 @@ Analyze the resume education level assessment and determine which education leve
 - 4 year degree (4): Bachelor's degree, undergraduate degree, or 4-year college programs
 - Post graduate degree (5): Master's degree, PhD, doctoral degree, or other advanced graduate degrees
 - Certification (6): Professional certifications, industry credentials, or specialized training certificates (when this is the highest level)
-- Look for explicit mentions of degrees, diplomas, or educational institutions
-- Consider graduation dates and degree names
-- Professional certifications should only be selected if no formal degree is mentioned
-- Choose the single highest level achieved
+- Look for explicit mentions of degree names (Associate, Bachelor, Master, PhD/Doctorate), diplomas, or certifications
+- Consider field names that imply level (e.g., MS/M.Sc = Master's, BS/B.Sc/BA = Bachelor's)
+- If ambiguous, choose 0
 
 **Output Format:**
-Return a list with one integer ID that matches the highest education level evidenced in the resume assessment.
-If no clear education level can be determined, return [0].
+Return the exact same structure as the input list of education entries, but with memberEducationLevelId populated for each entry.
 
-Examples:
-- If Bachelor's degree is mentioned: [4]
-- If Master's degree is the highest: [5]
-- If only high school is mentioned: [1]
-- If Associate degree is the highest: [2]
-- If PhD or doctoral degree: [5]
-- If only professional certifications (no formal degree): [6]
-- If education level cannot be determined: [0]
 """
 
     # Get the async client
     client = await get_async_client()
     
+    # Convert education_history to text for the prompt while relying on structured parsing for output
+    if isinstance(education_history, dict) or isinstance(education_history, list):
+        education_text = str(education_history)
+    else:
+        education_text = str(education_history)
+
     completion = await client.beta.chat.completions.parse(
-    model="gpt-4o",
-    messages=[
-        {"role": "system", "content": prompt_template},
-        {"role": "user", "content": f"Please analyze this education level assessment and return the matching education level ID: {resume_educationlevel_assessment}"}
-    ],
-    response_format=resume_data,
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": prompt_template},
+            {"role": "user", "content": f"Please analyze this education history and add memberEducationLevelId to each entry, preserving everything else:\n\n{education_text}"}
+        ],
+        response_format=resume_data,
     )
 
     analysis_response = completion.choices[0].message

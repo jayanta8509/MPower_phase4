@@ -52,8 +52,8 @@ async def main(path):
         growthmindset_agent(databse_data['growthmindset'], resume_step.growthMindset),
         mindfulness_agent(databse_data['mindfulness'], resume_step.mindfulness),
         technicalskills_agent(databse_data['technicalskills'], resume_step.technicalSkill),
-        industry_agent(databse_data['industry'], resume_string_step),
-        educationlevel_agent(databse_data['educationlevel'], resume_step.memberEducationLevel),
+        industry_agent(databse_data['industry'], databse_data['JobLevel'], resume_string_step.experience),
+        educationlevel_agent(databse_data['educationlevel'], resume_string_step.education),
         communication_agent(databse_data['communication'], resume_step.communication),
         leadership_agent(databse_data['leadership'], resume_step.leadership),
         metacognition_agent(databse_data['metacognition'], resume_step.metacognition),
@@ -64,20 +64,23 @@ async def main(path):
     # Extract agent results and tokens
     agent_tokens = 0
     processed_results = {}
+    enriched_education = None
     agent_names = [
         'character', 'collaboration', 'creativity', 'growthmindset', 
-        'mindfulness', 'technicalskills', 'experience', 'educationlevel',
+        'mindfulness', 'technicalskills', 'experience', 'education',
         'communication', 'leadership', 'metacognition', 'criticalthinking', 'fortitude'
     ]
     
     for i, (result, tokens) in enumerate(agent_results):
-        # Handle industry_agent differently since it returns experience data
-        if agent_names[i] == 'experience':
-            # For industry agent, return the complete experience data with industryId populated
-            processed_results[agent_names[i]] = result.steps[0].experience if result else []
+        name = agent_names[i]
+        # Handle structured agents that return full objects
+        if name == 'experience':
+            processed_results[name] = result.steps[0].experience if (result and getattr(result, 'steps', None)) else []
+        elif name == 'education':
+            enriched_education = result.steps[0].education if (result and getattr(result, 'steps', None)) else []
         else:
             # Store only the matched_ids array (flat structure) for other agents
-            processed_results[agent_names[i]] = result.steps[0].id if result else [0]
+            processed_results[name] = result.steps[0].id if (result and getattr(result, 'steps', None)) else [0]
         agent_tokens += tokens
     
     total_tokens = total_tokens1 + total_tokens2 + agent_tokens
@@ -86,9 +89,13 @@ async def main(path):
     clean_string_data = string_data.steps[0] if string_data.steps else {}
     
     # Remove experience from clean_string_data since it's handled by industry_agent
-    if hasattr(clean_string_data, 'experience'):
+    if hasattr(clean_string_data, 'experience') or hasattr(clean_string_data, 'education'):
         clean_string_data_dict = clean_string_data.model_dump()
         clean_string_data_dict.pop('experience', None)
+        clean_string_data_dict.pop('education', None)
+        # Replace education with enriched education returned by the education agent if present
+        if enriched_education is not None:
+            clean_string_data_dict['education'] = enriched_education
     else:
         clean_string_data_dict = clean_string_data
     
